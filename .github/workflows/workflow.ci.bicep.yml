@@ -42,6 +42,10 @@ jobs:
   PreviewDeploy:
     needs: Validate
     uses: ./.github/workflows/template.bicep.previewdeploy.yml
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
     with:
       environmentName: ${{ github.event.inputs.environmentName }}
       locationName: ${{ github.event.inputs.locationName }}
@@ -53,6 +57,10 @@ jobs:
   Test:
     needs: PreviewDeploy
     uses: ./.github/workflows/template.bicep.test.yml
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
     with:
       environmentName: ${{ github.event.inputs.environmentName }}
       locationName: ${{ github.event.inputs.locationName }}
