@@ -24,13 +24,15 @@ on:
         required: true
         default: "kv-anyrhvhu-267"
 
+permissions:
+  actions: read
+  contents: read
+  security-events: write
+  checks: write
+
 jobs:
   Validate:
     uses: ./.github/workflows/template.bicep.validate.yml
-    permissions:
-      actions: read
-      contents: read
-      security-events: write
     with:
       environmentName: ${{ github.event.inputs.environmentName }}
       locationName: ${{ github.event.inputs.locationName }}
