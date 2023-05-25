@@ -1,0 +1,57 @@
+name: Create Hub Network
+
+on:
+  workflow_call:
+    inputs:
+      ENVIRONMENT:
+        type: string
+        description: environment to deploy to
+        required: true
+      AZ_ENVIRONMENT_NAME:
+        type: string
+        description: Azure Deployment Environment name
+        required: true
+      ENVIRONMENT_TYPE:
+        type: string
+        description: Azure Deployment Environment type
+        required: true
+        
+    secrets:
+      AZURE_CLIENT_ID:
+        required: true
+
+jobs:
+  create-hub-network:
+    name: Create Hub Network
+    if: ${{ !github.event.act }} # skip during local actions testing
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.ENVIRONMENT }}
+
+    steps:
+      - name: "Checkout"
+        if: ${{ !env.ACT }}
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Azure Login
+        if: ${{ !env.ACT }}
+        uses: Azure/login@v1.4.3
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      
+      - name: Install DevCenter CLI Extension
+        if: ${{ !env.ACT }}
+        run: az extension add --name devcenter --upgrade
+
+      - name: Create Hub
+        run: |
+          az devcenter dev environment create \
+              --name ${{ inputs.AZ_ENVIRONMENT_NAME }}-hub --environment-type ${{ inputs.ENVIRONMENT_TYPE }} \
+              --dev-center ${{ vars.AZURE_DEVCENTER }} --project ${{ vars.AZURE_PROJECT }} \
+              --catalog-name ${{ vars.AZURE_CATALOG }} --catalog-item-name AksBaselineHub \
+              --parameters @./Environments/hub/hub.parameters.json
+
+
