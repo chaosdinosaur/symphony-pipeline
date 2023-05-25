@@ -1,7 +1,7 @@
 name: Create Hub Network
 
 on:
-  workflow_call:
+  workflow_dispatch:
     inputs:
       ENVIRONMENT:
         type: string
@@ -15,10 +15,10 @@ on:
         type: string
         description: Azure Deployment Environment type
         required: true
-        
-    secrets:
-      AZURE_CLIENT_ID:
-        required: true
+      
+permissions:
+      id-token: write
+      contents: read
 
 jobs:
   create-hub-network:
